@@ -7,7 +7,7 @@
 
 typedef struct Pessoa{
     long long num;
-    int markDown;
+    bool markDown;
     bool ignore;
 
     struct Pessoa *prox;
@@ -18,7 +18,7 @@ PESSOA *CriaPessoa(long long n){
 
     PESSOA *novo = (PESSOA*) malloc(sizeof(PESSOA));
     novo->prox = NULL;
-    novo->markDown = 0;
+    novo->markDown = false;
     novo->ignore = false;
     novo->num = n;
 
@@ -87,105 +87,77 @@ void outputFilePerTime(PESSOA *head, char *fileName, long long limit){
         temp = temp->prox;
     }
 
-    /*
-    if(temp == NULL){
-        temp = head;
-    }
-
-    long long i;
-
-    for(i=0; i<limit; i++){
-
-        printf("\nThe limit I received was %lld\n", limit);
-        printf("\nMarkdown is at %d", *markDownNum);
-
-        if(*markDownNum){
-            printf("\nI'm going to mark down %lld", i+1);
-            temp->markDown = 1;
-        }
-
-        *markDownNum = (*markDownNum + 1) % 2;
-        printf("\n\nMarkdown changed to %d\n", *markDownNum);
-
-        temp = temp->prox;
-    }
-    */
     fclose(f);
+}
+
+void markIgnore(PESSOA *head){
+    PESSOA *temp = head;
+    while(temp != NULL){
+        if(temp->markDown){
+            temp->ignore = true;
+        }
+    }
 }
 
 void changeMarkDown(PESSOA *head, long long checkLimit, bool *gotIgnore, long long limit){
     PESSOA *temp = head;
 
-    long long markDownNum = 0;
+    bool markDownSwitch = false;
+
+    long long markDownCount = 0;
 
     long long i=0;
-    printf("\nThe limit for checking is %lld", checkLimit);
+    printf("\nThe limit for checking is %lld\n", checkLimit);
 
-    for(i=0; i<checkLimit; i++){
-
-        (*gotIgnore) = false;
-
+    for(i=0; i<checkLimit< i++){
         long long checkAt = (i % limit) + 1;
 
-        if(!(temp->ignore)){
-
+        if(temp->ignore){
+            printf("\nIgnored %lld\n", checkAt);
+        }
+        else{
             printf("\nTesting %lld", checkAt);
-            if(markDownNum){
+
+            if(markDownSwitch){
                 printf("\nMarked down!\n");
 
-                temp->markDown = 1;
-                markDownNum = 0;
+                temp->markDown = true;
+                markDownCount++;
 
-                //*markDownCount = *markDownCount + 1;
+                markDownSwitch = false;
             }
             else{
                 printf("\nNot marked down!\n");
-                markDownNum = 1;
+
+                markDownSwitch = true;
             }
+        }
 
-            if(temp->prox == NULL){
-                printf("\nReached end of list!\n");
-                PESSOA *temp2 = head;
-
-                while(temp2 != NULL){
-
-                    if(temp2->markDown){
-                        printf("\nIgnoring %lld\n", temp2->num);
-                        temp2->ignore = true;
-                    }
-                    
-                    temp2 = temp2->prox;
+        if(temp->prox == NULL){
+            PESSOA *temp2 = head;
+            while(temp2 != NULL){
+                if(temp2->markDown){
+                    temp2->ignore = true;
                 }
-
-                temp = head;
-            }
-            else{
-                temp = temp->prox;
             }
 
+            temp = head;
         }
         else{
-            printf("\nIgnored %lld\n", checkAt);
-
-            (*gotIgnore) = true;
-
-            if(temp->prox == NULL){
-                temp = head;
-            }
-            else{
-                temp = temp->prox;
-            }
+            temp = temp->prox;
         }
     }
+
+    printf("\nTotal of %lld markdowns so far\n", markDownCount);
 }
 
 
-void resetListStatuses(PESSOA *head, long long limit){
+void resetListStatuses(PESSOA *head){
     PESSOA *temp = head;
 
     while(temp != NULL){
         temp->ignore = false;
-        temp->markDown = 0;
+        temp->markDown = false;
 
         temp = temp->prox;
     }
@@ -198,7 +170,7 @@ long long countTotalMarkDowns(PESSOA *head){
 
     PESSOA *temp = head;
     while(temp != NULL){
-        if(temp->markDown == 1){
+        if(temp->markDown == true){
             markDownCount++;
         }
 
@@ -211,7 +183,7 @@ long long countTotalMarkDowns(PESSOA *head){
 long long buscaEleito(PESSOA *head){
     PESSOA *temp = head;
     while(temp != NULL){
-        if((temp->markDown) == 0){
+        if((temp->markDown) == false){
             return temp->num;
         }
     }
@@ -253,25 +225,25 @@ int main(){
 
     while(markDownCount < (limit-1)){
 
-        resetListStatuses(ListaPessoas, limit);
+        resetListStatuses(ListaPessoas);
 
         printf("\nGoing to test mark down on %lld\n", i+1);
 
         changeMarkDown(ListaPessoas, i+1, &getIgnore, limit);
         outputFilePerTime(ListaPessoas, "simulacao_eleito.txt", i+1);
 
-        markDownCount = countTotalMarkDowns(ListaPessoas);
+        //markDownCount = countTotalMarkDowns(ListaPessoas);
 
         i++;
 
-        printf("\nWe have %lld markdowns so far\n", markDownCount);
+        //printf("\nWe have %lld markdowns so far\n", markDownCount);
 
-        if(getIgnore == true){
-            getIgnore = false;
-        }
-        else{
+        //if(getIgnore == true){
+        //    getIgnore = false;
+        //}
+        //else{
             system("pause");
-        }
+        //}
     }
 
     printf("\nHi");
