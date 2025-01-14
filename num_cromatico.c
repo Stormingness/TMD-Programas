@@ -32,10 +32,13 @@ void criarCores(int **matrizAdjunta, int **sequenciaGraus, int tamanho);
 void algGuloso(int **matrizAdjunta, int **sequenciaGraus, int tamanho);
 
 int main(){
-    
-    int linhas = contaLinhas("num_cromatico.txt");
 
-    printf("\nNumero de linhas: %d", linhas);
+    printf("\nPrograma criado por Junior Coelho\n");
+    printf("\n#################################\n");
+    
+    int linhas = contaLinhas("matriz_adjunta.txt");
+
+    //printf("\nNumero de linhas: %d\n", linhas);
 
     int n=0;
 
@@ -47,22 +50,37 @@ int main(){
 
     n=0;
 
-    FILE *p = fopen("num_cromatico.txt", "r");
+    FILE *p = fopen("matriz_adjunta.txt", "r");
 
     if(p == NULL){
-        printf("\nErro na abertura do ficheiro em main()");
+        printf("\nErro na abertura do ficheiro em main()\n");
+        system("pause");
         return -1;
     }
 
+    fseek(p, 0, SEEK_SET);
+
     while(!feof(p)){
-        fscanf(p, "%d %d %d %d %d\n", 
-            &matrizAdjunta[n][0], 
-            &matrizAdjunta[n][1], 
-            &matrizAdjunta[n][2], 
-            &matrizAdjunta[n][3], 
-            &matrizAdjunta[n][4] 
-            //&matrizAdjunta[n][5]
-        );
+
+        unsigned long pos = ftell(p);
+        fflush(p);
+        fseek(p, pos, SEEK_SET);
+
+        int i;
+
+        for(i=0; i<linhas; i++){
+            fscanf(p, "%d ", &matrizAdjunta[n][i]);
+            //printf("\nNumero de colunas nesta linha: %d", i+1);
+        }
+
+        if(i != linhas){
+            printf("\nErro: a matriz nao e quadrada.\n");
+            system("pause");
+            return -1;
+        }
+
+        //printf("\n");
+
         n++;
     }
 
@@ -70,15 +88,7 @@ int main(){
 
     int i, j;
 
-    /*
-    for(i=0; i<linhas; i++){
-        for(j=0; j<linhas; j++){
-            printf("\nmatrizAdjunta[%d][%d] = %d", i, j, matrizAdjunta[i][j]);
-        }
-    }
-    */
-
-   bool isSimetric = true;
+    bool isSimetric = true;
 
     for(i=0; i<linhas; i++){
         for(j=0; j<linhas; j++){
@@ -90,10 +100,12 @@ int main(){
     }
 
     if(isSimetric){
-        printf("\n\nA matriz adjunta e simetrica.\n");
+        //printf("\n\nA matriz adjunta e simetrica.\n");
     }
     else{
-        printf("\nErro: a matriz adjunta nao e simetrica.");
+        printf("\nErro: a matriz adjunta nao e simetrica.\n");
+        system("pause");
+        return -1;
     }
 
     //int sequenciaGraus[linhas][2]; //ALOCAR MATRIZ COM MALLOC, NAO PODE SER ESTATICA SE NAO ESTIVER DEFINIDA NO INICIO
@@ -101,12 +113,14 @@ int main(){
     int op;
     printf("\n--- MENU ---");
     printf("\n1. Algoritmo gluoso");
-    printf("\n2. Algoritmo de Welsh Powell\n");
+    printf("\n2. Algoritmo de Welsh Powell");
     
     do{
-        printf("Insira opcao: ");
+        printf("\nInsira opcao: ");
         scanf("%d", &op);
     }while((op < 1) || (op > 2));
+
+    printf("\n");
 
     int k;
 
@@ -133,12 +147,6 @@ int main(){
 
     int a;
 
-    for(a=0; a<linhas; a++){
-        printf("\nLetra %d tem grau %d", sequenciaGraus[a][0], sequenciaGraus[a][1]);
-    }
-
-    //printf("\n");
-
     if(op == 1){
         algGuloso(matrizAdjunta, sequenciaGraus, linhas);
     }
@@ -148,9 +156,6 @@ int main(){
             criarCores(matrizAdjunta, sequenciaGraus, linhas);
         }
     }
-
-    //printf("\n");
-    //printf("\n");
 
     a = 0;
     int numCrom = 0;
@@ -172,7 +177,6 @@ int main(){
     return -1;
 }
 
-
 void criarCores(int **matrizAdjunta, int **sequenciaGraus, int tamanho){
     int i, j;
     int corNum = 1;
@@ -187,14 +191,14 @@ void criarCores(int **matrizAdjunta, int **sequenciaGraus, int tamanho){
         for(j=0; j<i; j++){
             //printf("\nmatrizAdjunta[%d][%d] = %d", (sequenciaGraus[i][0])-1, (sequenciaGraus[j][0])-1, matrizAdjunta[(sequenciaGraus[i][0])-1][(sequenciaGraus[j][0])-1]);
         
+            //printf("\n\nVou verificar a entrada %d %d", sequenciaGraus[i][0], sequenciaGraus[j][0]);
+            //printf("\ni = %d; j = %d", i, j);
+
             if(matrizAdjunta[(sequenciaGraus[i][0])-1][(sequenciaGraus[j][0])-1] > 0){
-                printf("\nLetras %d e %d estao conectados", sequenciaGraus[i][0], sequenciaGraus[j][0]);
+                //printf("\nLetras %d e %d estao conectados", sequenciaGraus[i][0], sequenciaGraus[j][0]);
                 
                 if(sequenciaGraus[i][2] == sequenciaGraus[j][2]){
                     sequenciaGraus[i][2]++;
-                }
-                else{
-                    break;
                 }
 
                 /*
@@ -208,6 +212,8 @@ void criarCores(int **matrizAdjunta, int **sequenciaGraus, int tamanho){
 
             //printf("\n");
         }
+
+        //printf("\n");
 
         corNum = 1;
     }
@@ -228,40 +234,32 @@ void algGuloso(int **matrizAdjunta, int **sequenciaGraus, int tamanho){
     //bool searchEnabled = true;
 
     for(i=1; i<tamanho; i++){
+        while(j<i){
+            increase_j = true;
 
-        //if(searchEnabled){
-
-            while(j<i){
-                increase_j = true;
-                //int min = 1;
-                //int max = 1;
-
-                //printf("\nmatrizAdjunta[%d][%d] = %d", (sequenciaGraus[i][0])-1, (sequenciaGraus[j][0])-1, matrizAdjunta[(sequenciaGraus[i][0])-1][(sequenciaGraus[j][0])-1]);
+            //printf("\nmatrizAdjunta[%d][%d] = %d", (sequenciaGraus[i][0])-1, (sequenciaGraus[j][0])-1, matrizAdjunta[(sequenciaGraus[i][0])-1][(sequenciaGraus[j][0])-1]);
             
-                if(matrizAdjunta[(sequenciaGraus[i][0])-1][(sequenciaGraus[j][0])-1] > 0){
-                    printf("\nLetras %d e %d estao conectados", sequenciaGraus[i][0], sequenciaGraus[j][0]);
+            if(matrizAdjunta[(sequenciaGraus[i][0])-1][(sequenciaGraus[j][0])-1] > 0){
+                //printf("\nLetras %d e %d estao conectados", sequenciaGraus[i][0], sequenciaGraus[j][0]);
 
-                    if(sequenciaGraus[i][2] == sequenciaGraus[j][2]){
-                        sequenciaGraus[i][2]++;
-                        increase_j = false;
-                    }
+                if(sequenciaGraus[i][2] == sequenciaGraus[j][2]){
+                    sequenciaGraus[i][2]++;
+                    increase_j = false;
                 }
-                if(increase_j){
-                    j++;
-                }
-                else{
-                    j=0;
-                }
-                //printf("\n");
             }
-            j=0;
-        //}
+            if(increase_j){
+                j++;
+            }
+            else{
+                j=0;
+            }
+            //printf("\n");
+        }
+        j=0;
+
+        //printf("\n");
     }
 }
-
-
-
-
 
 void ordenaSequenciaBolha(int **sequenciaGraus, int tamanho){
     int i;
@@ -297,4 +295,3 @@ void ordenaSequenciaBolha(int **sequenciaGraus, int tamanho){
         printf("\nLetra %d tem grau %d", sequenciaGraus[a][0], sequenciaGraus[a][1]);
     }
 }
-
