@@ -170,7 +170,7 @@ int main(){
 
     a = 0;
 
-    printf("\nNumero cromatico: %d\n\n", numCrom);
+    printf("\n--> Numero cromatico: %d\n\n", numCrom);
 
     system("pause");
 
