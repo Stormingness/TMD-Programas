@@ -265,7 +265,7 @@ int main(){
     if(limit == 1){
         printf("\n");
 
-        printf("\neleito(%lld) = %lld\n\n", limit, 1);
+        printf("\n--> eleito(%lld) = %lld\n\n", limit, 1);
 
         system("pause");
 
