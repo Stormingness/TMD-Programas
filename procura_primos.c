@@ -4,25 +4,54 @@
 #include <stdbool.h>
 #include <time.h>
 
-#define sizeOfVector 99999
+//#define sizeOfVector 99999
 
 typedef struct No{
-    long long n;
-    long long *prox;
+    long long num;
+    struct No *prox;
 }NO;
 
+NO *CriaNo(long long n){
+    NO *novo = (NO*) malloc(sizeof(NO));
+    novo->num = n;
+    novo->prox = NULL;
 
+    return novo;
+}
+
+NO *AdicionaNo(NO *head, NO *novo){
+    if(head == NULL){
+        printf("\nErro na busca da cabeca da lista 'head' em AdicionaNo\n");
+    if(novo == NULL){
+        printf("\nError na busca do elemdnto 'novo' da lista em AdicionaNo\n");
+        return head;
+    }
+
+    NO *temp = head;
+
+    while(temp->prox != NULL){
+        temp = temp->prox;
+    }
+    temp->prox = novo;
+
+    return head;
+}
 
 
 
 bool semLema(long long num);
+
 bool comLema(long long num);
 
-long long getPrimes(long long *primeVector, int vectorSize, long long limit);
+//long long getPrimes(long long *primeVector, int vectorSize, long long limit);
+void getPrimes(NO *vetorPrimos, long long limit);
 
-bool comLemaTFA(long long num, long long *primeVector, long long vectorSize, int *numPrimes, long long *factVector);
+//bool comLemaTFA(long long num, long long *primeVector, long long vectorSize, int *numPrimes, long long *factVector);
+bool comLemaTFA(long long num, NO *vetorPrimos, int *numPrimes, NO *factoresVectorPrimos);
 
-void factoriseNum(long long num, long long *primeVector, long long vectorSize);
+//void factoriseNum(long long num, long long *primeVector, long long vectorSize);
+void factorizarNum(long long num, NO *fatoresVetor);
+
 
 int main(){
 
@@ -46,13 +75,13 @@ int main(){
 
     int op;
 
-    printf("\n\nAlgorithm Menu:");
+    printf("\n--- MENU ---");
     printf("\n1. Sem Lema");
     printf("\n2. Com Lema");
     printf("\n3. Com Lema + TFA\n");
 
     do{
-    printf("Insert an option from the menu: ");
+    printf("Insira opcao do menu: ");
     scanf("%d", &op);
     }while(op < 1 || op > 3);
 
@@ -71,30 +100,29 @@ int main(){
                 endTime = clock();
                 break;
 
-        case 3: long long primes[sizeOfVector];
+        case 3: //long long primes[sizeOfVector];
+                NO *ListaPrimos = CriaNo(0);
                 long long k;
 
-                long long newVectorSize = getPrimes(primes, sizeOfVector, num);
-
-                /*
-                for(k=0; k<newVectorSize; k++){
-                    printf("\nprimes[%lld] = %lld", k, primes[k]);
-                }
-                */
+                //long long newVectorSize = getPrimes(primes, sizeOfVector, num);
+                //long long newVectorSize = getPrimes(ListaPrimos, num);
+                getPrimes(ListaPrimos, num);
 
                 int NumberOfPrimes;
 
-                long long factoriseVector[sizeOfVector];
+                //long long factoriseVector[sizeOfVector];
+                NO *fatoresVetorPrimos = CriaNo(0);
 
                 startTime = clock();
-                isPrime = comLemaTFA(num, primes, newVectorSize, &NumberOfPrimes, factoriseVector);
+                isPrime = comLemaTFA(num, ListaPrimos, &NumberOfPrimes, fatoresVetorPrimos);
                 endTime = clock();
 
-                printf("\nNumber of factor primes: %d", NumberOfPrimes);
+                //printf("\nNumber of factor primes: %d", NumberOfPrimes);
 
                 if(NumberOfPrimes>0){
-                    factoriseNum(num, factoriseVector, NumberOfPrimes);
+                    factorizarNum(num, fatoresVetorPrimos);
                 }
+
                 break;
         
         default: printf("\nErro na execucao da opcao %d", op);
@@ -103,11 +131,11 @@ int main(){
     totalTime = (double) (endTime - startTime) / CLOCKS_PER_SEC;
 
     if(isPrime)
-        printf("\n\n%lld is prime? = true", num);
+        printf("\n\n--> Conclusao: %lld e numero primo", num);
     else
-        printf("\n\n%lld is prime? = false", num);
+        printf("\n\n--> Conclusao: %lld nao e numero primo", num);
 
-    printf("\nTotal function execution time in seconds: %.9lf\n", totalTime);
+    printf("\n\n--> Tempo total de execucao do metodo escolihdo (em segundos): %.9lf\n\n", totalTime);
 
     system("pause");
     return -1;
@@ -143,9 +171,10 @@ bool comLema(long long num){
     return isPrime;
 }
 
-long long getPrimes(long long *primeVector, int vectorSize, long long limit){
+//long long getPrimes(NO *vetorPrimos, long long limit){
+void getPrimes(NO *vetorPrimos, long long limit){
 
-    long long i, j, pos=0;
+    long long i, j, pos=0, posCheck = 0;
 
     bool i_isPrime = true;
 
@@ -158,88 +187,172 @@ long long getPrimes(long long *primeVector, int vectorSize, long long limit){
                 }
             }
 
-            if(i_isPrime){
-                printf("\ni = %lld is prime", i);
-                primeVector[pos] = i;
-                printf("\nprimeVector[%lld] = %lld", pos, primeVector[pos]);
-                pos++;
+            if(i == 2){
+                vetorPrimos->num = i;
+            }
+            else{
+                if(i_isPrime){
+                    //printf("\ni = %lld is prime", i);
+
+                    NO *novoElemento = CriaNo(i);
+                    vetorPrimos = AdicionaNo(vetorPrimos, novoElemento);
+
+                    /*
+                    NO *temp = vetorPrimos;
+
+                    printf("\nPos before loop: %lld", pos);
+                    printf("\nPosCheck before loop: %lld", posCheck);
+
+                    for(posCheck = 0; posCheck < pos; posCheck++){
+                        printf("\nPosCheck in loop: %lld", posCheck);
+                        temp = temp->prox;
+                        posCheck++;
+                    }
+                    printf("\nPosCheck after loop: %lld", posCheck);
+                    //posCheck = 0;
+                    */
+
+                    //temp = novoElemento;
+
+                    //printf("\nNumero neste temp = %lld\n", temp->num);
+
+                    //primeVector[pos] = i;
+
+                    //printf("\nprimeVector[%lld] = %lld", pos, primeVector[pos]);
+                    //pos++;
+                }
             }
 
             i_isPrime = true;
         }
 
-    return pos;
+        NO *temp1 = vetorPrimos;
+
+        //printf("\n\nLISTA PRIMOS ATE RAIZ:");
+        while(temp1 != NULL){
+            //printf("\n%lld", temp1->num);
+            temp1 = temp1->prox;
+        }
+
+    //return pos;
 }
 
-bool comLemaTFA(long long num, long long *primesVector, long long vectorSize, int *numPrimes, long long *factVector){
+//bool comLemaTFA(long long num, long long *primesVector, long long vectorSize, int *numPrimes, long long *factVector){
+bool comLemaTFA(long long num, NO *vetorPrimos, int *numPrimes, NO *fatoresVetorPrimos){ 
     long long i;
     bool isPrime = true;
 
     int NumOfPrimes = 0;
 
-    for(i=0; i<vectorSize; i++){
-        if((num % primesVector[i]) == 0){
-            printf("\n%lld|%lld", primesVector[i], num);
+    NO *temp = vetorPrimos;
+
+    //for(i=0; i<vectorSize; i++){
+    while(temp != NULL){
+        if((num % (temp->num)) == 0){
+            printf("\n%lld|%lld", temp->num, num);
             isPrime = false;
-            factVector[NumOfPrimes] = primesVector[i];
+
+            if(NumOfPrimes == 0){
+                fatoresVetorPrimos->num = temp->num;
+            }
+            else{
+                NO *novoElemento = CriaNo(temp->num);
+                fatoresVetorPrimos = AdicionaNo(fatoresVetorPrimos, novoElemento);
+            }
             NumOfPrimes++;
-            //break;
         }
+        temp = temp->prox;
     }
 
     *numPrimes = NumOfPrimes;
 
+    printf("\n\nTotal de divisores primos ate a raiz: %lld", NumOfPrimes);
+    //printf("\nLISTA PRIMOS DIVISIVEIS ATE RAIZ:");
+    NO *temp1 = fatoresVetorPrimos;
+    while(temp1 != NULL){
+        //printf("\n%lld", temp1->num);
+        temp1 = temp1->prox;
+    }
+
     return isPrime;
 }
 
-void factoriseNum(long long num, long long *primeVector, long long vectorSize){
+//void factoriseNum(long long num, long long *primeVector, long long vectorSize){
+void factorizarNum(long long num, NO *fatoresVetor){
     
+    printf("\n");
+
     long long number = num;
 
-    long long exponentVector[vectorSize];
-    int j;
+    //long long exponentVector[vectorSize];
+    NO *exponentesVetor = CriaNo(0);
 
-    for(j=0; j<vectorSize; j++){
+    NO *temp = fatoresVetor;
+
+    while(temp->prox != NULL){
+        NO *novoElemento = CriaNo(0);
+        exponentesVetor = AdicionaNo(exponentesVetor, novoElemento);
+
+        temp = temp->prox;
+    }
+
+    /*
+    for(j=1; j<numFatores; j++){
         exponentVector[j] = 0;
     }
+    */
 
-    int k;
+    //int k;
 
-    for(k=0; k<vectorSize; k++){
-        while((number % primeVector[k]) == 0){
-            number = number / primeVector[k];
-            exponentVector[k]++;
+    NO *temp1 = fatoresVetor;
+    NO *temp2 = exponentesVetor;
+
+    //for(k=0; k<vectorSize; k++){
+    while(temp1 != NULL);
+        while((number % (temp1->num)) == 0){
+            number = number / (temp1->num);
+            (temp2->num)++;
         }
+
+        temp1 = temp1->prox;
+        temp2 = temp2->prox;
     }
 
-    printf("\n%lld = ", num);
+    printf("\nTeorema Fundamental da Aritmetica:\n%lld = ", num);
 
-    int n;
+    //int n;
 
-    for(n=0; n<vectorSize-1; n++){
-        if(exponentVector[n] == 1){
-            printf("%lld x ", primeVector[n]);
+    temp1 = fatoresVetor;
+    temp2 = exponentesVetor;
+
+    //for(n=0; n<(vectorSize-1); n++){
+    while(temp2->prox != NULL){
+        if(temp2->num == 1){
+            printf("%lld x ", temp1->num);
         }
         else{
-            printf("%lld^%lld x ", primeVector[n], exponentVector[n]);
+            printf("%lld^%lld x ", temp1->num, temp2->num);
         }
+
+        temp1 = temp1->prox;
+        temp2 = temp2->prox;
     }
 
-    if(number>0){
-        if(exponentVector[vectorSize-1] == 1){
-            printf("%lld x %lld\n", primeVector[vectorSize-1], number);
+    if(number>1){
+        if(temp2->num == 1){
+            printf("%lld x %lld", temp1->num, number);
 
         }
         else{
-            printf("%lld^%lld x %lld\n", primeVector[vectorSize-1], exponentVector[vectorSize-1], number);
+            printf("%lld^%lld x %lld", temp1-1>num, temp2->num, number);
         }
     }
     else{
-        if(exponentVector[vectorSize-1] == 1){
-            printf("%lld\n", primeVector[vectorSize-1]);
+        if(temp2->num == 1){
+            printf("%lld", temp1->num);
         }
         else{
-            printf("%lld^%lld\n", primeVector[vectorSize-1], exponentVector[vectorSize-1]);
+            printf("%lld^%lld", temp1->num, temp2->num);
         }
     }
 }
