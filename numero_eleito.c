@@ -259,8 +259,12 @@ int main(){
 
     long long limit;
 
-    printf("\nInsira o numero de pessoas: ");
-    scanf("%lld", &limit);
+    printf("\n");
+
+    do{
+        printf("Insira o numero de pessoas: ");
+        scanf("%lld", &limit);
+    }while(limit < 1);
 
     if(limit == 1){
         printf("\n");
