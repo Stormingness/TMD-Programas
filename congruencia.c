@@ -5,7 +5,7 @@
 #define CICLO_LIMITE 99999
 
 int main(){
-    printf("\nPrograma criado por Junior Coelho\n");
+    printf("\nPrograma criado por Stormingness\n");
     printf("\n#################################\n");
 
     char a[80], b[80], c[80];
