@@ -293,7 +293,7 @@ void factorizarNum(long long numAvaliar, NO *fatoresVetor){
 
 int main(){
 
-    printf("\nPrograma criada por Junior Coelho\n");
+    printf("\nPrograma criada por Stormingness\n");
     printf("\n#################################\n");
 
     long long num;
