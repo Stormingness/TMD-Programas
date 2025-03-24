@@ -254,7 +254,7 @@ long long buscaEleito(PESSOA *head){
 
 int main(){
 
-    printf("\nPrograma criado por Junior Coelho\n");
+    printf("\nPrograma criado por Stormingness\n");
     printf("\n#################################\n");
 
     long long limit;
