@@ -33,7 +33,7 @@ void algGuloso(int **matrizAdjunta, int **sequenciaGraus, int tamanho);
 
 int main(){
 
-    printf("\nPrograma criado por Junior Coelho\n");
+    printf("\nPrograma criado por Stormingness\n");
     printf("\n#################################\n");
     
     int linhas = contaLinhas("matriz_adjunta.txt");
